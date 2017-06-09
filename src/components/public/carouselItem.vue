@@ -35,7 +35,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
+<style scoped>
 .tel-carousel-item{
   width: 100%;
   height: 100%;

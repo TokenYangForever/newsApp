@@ -28,9 +28,9 @@ export default {
   font-family: 'icomoon';
   src:  url('fonts/icomoon.eot?5cra4k');
   src:  url('fonts/icomoon.eot?5cra4k#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?5cra4k') format('truetype'),
-    url('fonts/icomoon.woff?5cra4k') format('woff'),
-    url('fonts/icomoon.svg?5cra4k#icomoon') format('svg');
+        url('fonts/icomoon.ttf?5cra4k') format('truetype'),
+        url('fonts/icomoon.woff?5cra4k') format('woff'),
+        url('fonts/icomoon.svg?5cra4k#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -54,6 +54,9 @@ i {
 }
 .news-iconmenu:before {
   content: "\e9bd";
+}
+.news-iconsmile:before {
+  content: "\e9e1";
 }
 html{
   font-size: 100px;
@@ -100,6 +103,7 @@ div{
   color: #c2daf8;
   text-align: center;
   background-color: #3e98f0;
+  z-index: 11
 }
 .navitem{
   height: inherit;

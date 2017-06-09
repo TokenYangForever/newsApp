@@ -43,6 +43,31 @@ app.get('/getrecommendNews.html', function (req, res) {
   });  
 });
 
+app.get('/getNewsByType.html', function (req, res) {
+  var reqdata = req.query;
+  var result = [];
+  if(!reqdata || !reqdata.type) {
+    res.send('缺少参数type')
+  }
+  reqdata.index = reqdata.index || 0;
+  reqdata.len = reqdata.len || 10;
+  var tablename = reqdata.type + 'news'
+  //var qstring = 'SELECT * from admins where username="'+req.query.name+'"';
+  var qstring = 'SELECT * from '+ tablename + ' limit '+ reqdata.index +','+reqdata.len
+  connection.query(qstring,[2], function(err, rs) { 
+    if (err) { 
+      console.log('[query] - :'+err); 
+      return; 
+    } 
+    var backdata = {}
+    for(var i=0;i<rs.length;i++){
+      result.push(rs[i]);
+    }
+    backdata.data = result || []
+    res.send(backdata);
+  });  
+});
+
 app.get('/getcalNews.html', function (req, res) {
   // req.query 请求参数
   var result = [];
@@ -95,6 +120,8 @@ app.post('/saveNews.html', function (req, res) {
   }
   res.send(200);
 });
+
+
 
 var server = app.listen(8081, function () {
   var host = server.address().address

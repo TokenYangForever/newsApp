@@ -54,10 +54,9 @@ export default {
     },
 
     startTimer () {
-      const _this = this
-      this.addTimer = setTimeout(function () {
-        _this.addIndex()
-        _this.startTimer()
+      this.addTimer = setTimeout(() => {
+        this.addIndex()
+        this.startTimer()
       }, 2000)
     },
 
@@ -81,11 +80,13 @@ export default {
         this.addIndex()
       }
       this.startX = 0;
-      // this.startTimer()
+      // this.startTimer() // 滑动停止时，是否继续自动滚动
     },
 
     mousemove () {
-      this.stopX = event.targetTouches[0].clientX
+      this.$commonjs.throttle((e) => {
+        this.stopX = e.targetTouches[0].clientX
+      }, 500)(event)
     }
   },
 
@@ -100,7 +101,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
+<style scoped>
 .tel-carousel-ul{
   position: relative;
   overflow: hidden;

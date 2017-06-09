@@ -3,9 +3,9 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-
+import _ from '@/public/common'
+Object.defineProperty(Vue.prototype, '$commonjs', { value: _ })
 Vue.config.productionTip = false
-
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
