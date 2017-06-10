@@ -2,7 +2,7 @@
   <div id="app">
     <div class="headnav">
       <div class="topItems">
-        <span class="topnav-search"><i class='news-iconsearch'></i></span>
+        <span class="topnav-search" @click='toSearch'><i class='news-iconsearch'></i></span>
         <span class="topnav-menu"><i class="news-iconmenu"></i></span>
       </div>
       <div class="flexbox navul">
@@ -18,8 +18,16 @@
 </template>
 
 <script>
+import router from './router'
 export default {
-  name: 'app'
+  name: 'app',
+  methods: {
+    toSearch () {
+      router.push({
+        name: 'search'
+      })
+    }
+  }
 }
 </script>
 
