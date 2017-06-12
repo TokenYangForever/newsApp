@@ -43,6 +43,28 @@ app.get('/getrecommendNews.html', function (req, res) {
   });  
 });
 
+app.get('/searchNews.html', function (req, res) {
+  var reqdata = req.query;
+  var backdata = {};
+  var result =[];
+  if(!reqdata || !reqdata.searchval) {
+    backdata.data = '缺少参数searchval'
+    res.send(backdata)
+  }
+  var qstring = 'SELECT * FROM allnews WHERE title like "%'+ reqdata.searchval +'%"';
+  connection.query(qstring, function(err, rs) { 
+    if (err) { 
+      console.log('[query] - :'+err); 
+      return; 
+    } 
+    for(var i=0;i<rs.length;i++){
+      result.push(rs[i]);
+    }
+    backdata.data = result || []
+    res.send(backdata);
+  }); 
+});
+
 app.get('/getNewsByType.html', function (req, res) {
   var reqdata = req.query;
   var result = [];

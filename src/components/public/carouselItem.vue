@@ -1,5 +1,6 @@
 <template>
   <div 
+  @click = 'clickFunc'
   class="tel-carousel-item"
   :style="{
     msTransform: translate,
@@ -15,9 +16,10 @@ export default {
   name: 'carouselItem',
   props: {
     height: String,
-    width: String
+    width: String,
+    callback: Function,
+    url: String
   },
-
   data () {
     return {
       translate: '',
@@ -25,10 +27,17 @@ export default {
     }
   },
 
+  mounted () {
+    // console.log(this.callback)
+  },
+
   methods: {
     setTranslate (index, actIndex) {
       const parentWidth = this.$parent.width
       this.translate = 'translateX(' + parentWidth * (index - actIndex) + 'px)'
+    },
+    clickFunc () {
+      this.callback(this.url)
     }
   }
 }

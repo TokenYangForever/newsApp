@@ -1,33 +1,12 @@
 <template>
   <div id="app">
-    <div class="headnav">
-      <div class="topItems">
-        <span class="topnav-search" @click='toSearch'><i class='news-iconsearch'></i></span>
-        <span class="topnav-menu"><i class="news-iconmenu"></i></span>
-      </div>
-      <div class="flexbox navul">
-        <div class="flex1 navitem">推荐</div>
-        <div class="flex1 navitem">国际</div>
-        <div class="flex1 navitem">国内</div>
-        <div class="flex1 navitem">社会</div>
-        <div class="flex1 navitem">军事</div>
-      </div>
-    </div>
     <router-view></router-view>
   </div>
 </template>
 
 <script>
-import router from './router'
 export default {
-  name: 'app',
-  methods: {
-    toSearch () {
-      router.push({
-        name: 'search'
-      })
-    }
-  }
+  name: 'app'
 }
 </script>
 
@@ -66,8 +45,22 @@ i {
 .news-iconsmile:before {
   content: "\e9e1";
 }
+.news-iconarrow-left:before {
+  content: "\ea38";
+}
+.news-iconarrow-left2:before {
+  content: "\ea40";
+}
+.news-iconarrow-up-left2:before {
+  content: "\ea39";
+}
 html{
   font-size: 100px;
+}
+body * {
+  padding: 0;
+  margin: 0;
+  font-size: .16rem;
 }
 @media screen and (max-width: 360px){
   html {
@@ -81,37 +74,54 @@ html{
 div{
   box-sizing: border-box;
 }
-.topnav-search{
-  padding: 7px;
-  top: 7px;
-  right: .45rem;
-  font-size: .2rem;
-  position: absolute;
-}
-.topnav-menu{
-  padding: 7px;
-  top: 5px;
-  right: 5px;
-  font-size: .24rem;
-  position: absolute;
-}
-.topItems{
+.news-item-pic{
+  margin-right: 10px;
   position: relative;
-  border-bottom: 1px solid #5dabf0;
-  height: 49px;
+  height: .66rem;
+  width: 1rem;
 }
-.navul{
-  height: 40px;
-  line-height: 40px;
-}
-.headnav {
-  position: fixed;
+.news-item-pic img{
+  position: absolute;
   top: 0;
+  left: 0;
   width: 100%;
-  color: #c2daf8;
-  text-align: center;
-  background-color: #3e98f0;
-  z-index: 11
+  height: 100%;
+}
+.nomore{
+  font-size: .16rem;
+  margin: 10px 0;
+}
+.news-item-content h4{
+  line-height: .2rem;
+  font-size: .17rem;
+  word-break:break-all;
+  text-align: justify;
+}
+.news-item-content{
+  flex:1;
+}
+.news-item-source{
+  font-size: .1rem;
+  line-height: .2rem;
+  color: #888;
+  margin-top: 5px;
+}
+.news-author{
+  float: left;
+}
+
+.news-comments{
+  float: right;
+}
+.main-news-item{
+  padding: .1rem 0;
+  margin: 0 .1rem;
+  box-sizing: border-box;
+  border-bottom: 1px solid #e4e4e4;
+  display: flex;
+}
+.navitem.select{
+  border-bottom: 2px solid #fff!important;
 }
 .navitem{
   height: inherit;

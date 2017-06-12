@@ -30,8 +30,8 @@ export default {
         merge: 3,
         statics: 1,
         tm: 1489716199,
-        action: 1,
-        up: 16,
+        action: 0,
+        up: 0,
         down: 0,
         length: 12,
         _: 1496716010393
@@ -60,7 +60,7 @@ export default {
             if (data[i].category) {
               dataItem.type = Object.keys(data[i].category)[0];
             }
-            if (dataItem.type === '新闻中心_国际') {
+            if (dataItem.type === '新闻中心_国内' && dataItem.title) {
               sendData.push(dataItem);
             }
           }
@@ -70,7 +70,7 @@ export default {
             data: {
               'sendData': sendData,
               'datalength': sendData.length,
-              'tablename': 'internationalNews'// 'recommendNews',sociologyNews
+              'tablename': 'domesticnews'// 'recommendNews',sociologyNews 'internationalNews'
             },
             success: function (d) {
               console.log(d)

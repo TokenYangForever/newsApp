@@ -1,5 +1,14 @@
 <template>
   <div id="newslist">
+    <div class="headnav">
+      <div class="topItems">
+        <span class="topnav-search" @click='toSearch'><i class='news-iconsearch'></i></span>
+        <span class="topnav-menu"><i class="news-iconmenu"></i></span>
+      </div>
+      <div class="flexbox navul">
+        <div class="flex1 navitem" v-for="item in newsType" @click='choose(item)' :class="{'select': item == select}">{{item}}</div>
+      </div>
+    </div>
     <tel-carousel
       :height = 'calImgheight'
       :width = 'calImgwidth'
@@ -7,7 +16,7 @@
       :picNum = 'calNews.length'
       v-if = 'showcal'
     >
-      <tel-carousel-item v-for="(item, index) in calNews" :key="index">
+      <tel-carousel-item v-for="(item, index) in calNews" :key="index" :callback = 'clickNews' :url='item.url'>
         <img :src='item.picurl'>
         <h3>{{ item.intext }}</h3>
       </tel-carousel-item>
@@ -21,14 +30,14 @@
              webkitTransform: translatescroll,
              transform: translatescroll
            }">
-        <div class="scroll-item" v-for="(item, index) in scrollNews">{{item.text}}</div>
+        <div class="scroll-item" v-for="(item, index) in scrollNews" @click='clickNews(item.url)'>{{item.text}}</div>
       </div>
     </div>
 
     <div class="main-news-list">
-      <div class="main-news-item" v-for="(item, index) in mainnewsList" :id='index'>
+      <div class="main-news-item" v-for="(item, index) in mainnewsList" :id='index' v-if='item.title' @click='clickNews(item.URL)'>
         <div class="news-item-pic" v-if='item.allPics'>
-          <img src='default.jpg' :data-src='item.allPics' class='lazyloadimg'>
+          <img src='./../assets/default.png' :data-src='item.allPics' class='lazyloadimg'>
         </div>
         <div class="news-item-content">
           <h4 class="news-item-title">{{item.title}}</h4>
@@ -49,10 +58,14 @@
 <script>
 import telcarousel from '@/components/public/carousel'
 import telcarouselItem from '@/components/public/carouselItem'
+import vue from 'vue'
+import router from '@/router'
 export default{
   name: 'home',
   data () {
     return {
+      newsType: ['推荐', '国际', '国内', '社会', '军事'],
+      select: '推荐',
       mainnewsList: [],
       calImgheight: Math.round(0.6 * window.innerWidth),
       calImgwidth: window.innerWidth,
@@ -121,6 +134,12 @@ export default{
           let backdata = JSON.parse(data);
           if (backdata.data && backdata.data.length > 0) {
             _this.mainnewsList = _this.mainnewsList.concat(backdata.data);
+            if (_this.shownewIndex === 0) {
+              vue.nextTick(() => {
+                _this.lazyLoadimg()
+              });
+            }
+            _this.shownewIndex += backdata.data.length;
           } else {
             _this.nomoreNews = true
           }
@@ -134,19 +153,59 @@ export default{
 
     watchscroll () {
       let body = document.getElementById('newslist');
-      let imgs = document.getElementsByClassName('news-item-pic');
-      if (window.scrollY + window.innerHeight > body.offsetHeight) {
-        this.shownewIndex += this.shownewLength;
+      if (window.scrollY + window.innerHeight > body.offsetHeight && this.shownewIndex !== 0) {
         this.getNewsByType(this.shownewType, this.shownewIndex, this.shownewLength);
       }
+      this.lazyLoadimg();
+    },
+
+    lazyLoadimg () {
+      let imgs = document.getElementsByClassName('news-item-pic');
       for (let i = this.loadimgs; i < imgs.length; i++) {
         if (imgs[i].offsetTop < window.innerHeight + document.body.scrollTop) {
-          if (imgs[i].children[0].getAttribute('src') === 'default.jpg') {
+          if (imgs[i].children[0].getAttribute('src') !== imgs[i].children[0].getAttribute('data-src')) {
             imgs[i].children[0].src = imgs[i].children[0].getAttribute('data-src');
           }
           this.loadimgs = i + 1;
         }
       }
+    },
+
+    toSearch () {
+      router.push({
+        name: 'search'
+      })
+    },
+
+    clickNews (url) {
+      location.href = url;
+    },
+
+    choose (i) {
+      let typemap = {
+        '推荐': 'recommend',
+        '国际': 'international',
+        '国内': 'domestic',
+        '社会': 'sociology',
+        '军事': 'military'
+      }
+      if (this.select !== i) {
+        this.select = i;
+        this.shownewType = typemap[this.select]
+      }
+    }
+  },
+
+  watch: {
+    shownewType: function (val, oldval) {
+      if (val !== 'recommend') {
+        this.showcal = false
+      } else {
+        this.showcal = true
+      }
+      this.mainnewsList = [];
+      this.shownewIndex = this.loadimgs = 0;
+      this.getNewsByType(this.shownewType, this.shownewIndex, this.shownewLength);
     }
   },
 
@@ -158,30 +217,37 @@ export default{
 </script>
 
 <style scoped>
-.nomore{
-  font-size: .16rem;
-  margin: 10px 0;
-}
-.main-news-item{
-  padding: .1rem 0;
-  margin: 0 .1rem;
-  box-sizing: border-box;
-  border-bottom: 1px solid #e4e4e4;
-  display: flex;
-}
-
-.news-item-pic{
-  margin-right: 10px;
-  position: relative;
-  height: .66rem;
-  width: 1rem;
-}
-.news-item-pic img{
+.topnav-search{
+  padding: 7px;
+  top: 7px;
+  right: .45rem;
+  font-size: .2rem;
   position: absolute;
+}
+.topnav-menu{
+  padding: 7px;
+  top: 5px;
+  right: 5px;
+  font-size: .24rem;
+  position: absolute;
+}
+.topItems{
+  position: relative;
+  border-bottom: 1px solid #5dabf0;
+  height: 49px;
+}
+.navul{
+  height: 40px;
+  line-height: 40px;
+}
+.headnav {
+  position: fixed;
   top: 0;
-  left: 0;
   width: 100%;
-  height: 100%;
+  color: #c2daf8;
+  text-align: center;
+  background-color: #3e98f0;
+  z-index: 11
 }
 .news-comments .news-iconsmile{
   margin-right: 5px;
@@ -189,35 +255,6 @@ export default{
 
 .main-news-list{
   margin-top: 10px;
-}
-
-.news-item-source{
-  font-size: .1rem;
-  line-height: .2rem;
-}
-
-.news-item-content{
-  flex:1;
-}
-
-.news-item-source{
-  color: #888;
-  margin-top: 5px;
-}
-
-.news-author{
-  float: left;
-}
-
-.news-comments{
-  float: right;
-}
-
-.news-item-content h4{
-  line-height: .2rem;
-  font-size: .17rem;
-  word-break:break-all;
-  text-align: justify;
 }
 
 #newslist{
