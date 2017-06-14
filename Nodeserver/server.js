@@ -1,6 +1,9 @@
 ﻿var mysql = require('mysql'); //调用MySQL模块
 var express = require('express');
 var bodyParser = require("body-parser"); 
+var cheerio = require('cheerio');
+var request = require('request');
+var http = require('http')
 var app = express()
 app.use(bodyParser.urlencoded({ extended: false }));
 app.all('*', function(req, res, next) {
@@ -46,24 +49,6 @@ app.get('/searchNews.html', function (req, res) {
     backdata.data = result || []
     res.send(backdata);
   }); 
-});
-
-app.get('/getrecommendNews.html', function (req, res) {
-  // req.query 请求参数
-  var result = [];
-  //var qstring = 'SELECT * from admins where username="'+req.query.name+'"';
-  var qstring = 'SELECT * from recommendnews'
-  connection.query(qstring,[2], function(err, rs) { 
-    if (err) { 
-      console.log('[query] - :'+err); 
-      return; 
-    } 
-    //result = rs;
-    for(var i=0;i<rs.length;i++){
-      result.push(rs[i]);
-    }
-    res.send(result);
-  });  
 });
 
 app.get('/getNewsByType.html', function (req, res) {
@@ -119,6 +104,28 @@ app.get('/getcalNews.html', function (req, res) {
   });  
 });
 
+app.get('/getDetail.html', function (req, res) {
+  // req.query 请求参数
+  var result = [];
+  var backdata = {};
+  if (!req.query.url) {
+    res.send('需要参数url')
+  }
+  request(req.query.url, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      var $ = cheerio.load(body,{decodeEntities: false});
+      var ptext = transHtml($('p'));
+      var imgs = transImg($('img'));
+      backdata.htmlContent = ptext+imgs;
+      backdata.title = $('h1').text();
+      backdata.code = 200;
+      res.send(backdata)
+    } else {
+      // do error
+    }
+  });
+});
+
 app.post('/saveNews.html', function (req, res) {
   var backdata = [];
   rdata = req.body;
@@ -143,6 +150,32 @@ app.post('/saveNews.html', function (req, res) {
   }
   res.send(200);
 });
+
+function transHtml (obj) {
+  var result = '<div class="newsContent">'
+  for (var i = 0; i < obj.length; i++) {
+    if (obj.eq(i).text()) {
+      result+='<p>' + obj.eq(i).text() + '</p>'
+    } else {
+      continue;
+    }
+    
+  }
+  return result+='</div>'
+}
+
+function transImg (obj) {
+  var result = '<div class="imgsContent">'
+  for (var i = 0; i < obj.length; i++) {
+    if (obj.eq(i).attr('src')) {
+      result+='<img src='+ obj.eq(i).attr('src') + '></img>'
+    } else {
+      continue;
+    }
+    
+  }
+  return result+='</div>'
+}
 var server = app.listen(8081, function () {
   var host = server.address().address
   var port = server.address().port
