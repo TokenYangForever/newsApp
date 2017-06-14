@@ -82,6 +82,7 @@ export default{
     }
   },
   mounted () {
+    document.title = 'XX新闻'
     window.onscroll = this.$commonjs.throttle(this.watchscroll, 200)
     this.getCalnews();
     this.getNewsByType(this.shownewType, this.shownewIndex, this.shownewLength);
@@ -178,7 +179,11 @@ export default{
     },
 
     clickNews (url) {
-      location.href = url;
+      // location.href = url;
+      router.push({
+        name: 'detail',
+        params: { url: url }
+      })
     },
 
     choose (i) {

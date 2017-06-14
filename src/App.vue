@@ -67,6 +67,16 @@ body * {
     font-size: 90px;
   }
 }
+.imgsContent img {
+  max-width: 100%
+}
+.newsContent p{
+  margin-bottom: 20px;
+  text-align: justify;
+  font-size: .18rem;
+  text-indent: .18rem;
+  padding: 0 10px;
+}
 *{
   margin: 0;
   padding: 0;
