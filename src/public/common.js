@@ -160,6 +160,7 @@ const _ = {
   },
 
   ajax: function (options) {
+    console.log(options)
     var ajaxSettings = {
       type: 'GET',
       url: '',
@@ -170,7 +171,7 @@ const _ = {
       xhr: function () {
         return new window.XMLHttpRequest()
       },
-      data: '',
+      data: {},
       timeout: 0,
       cache: true,
       accepts: {
@@ -185,11 +186,20 @@ const _ = {
       if (query == '') return url
       return (url + '&' + query).replace(/[&?]{1,2}/, '?')
     }
+   
     var settings = ajaxSettings;
     for (var key in ajaxSettings) {
       if (options[key] != undefined) {
         settings[key] = options[key];
       }
+    }
+    if(settings.data && settings.type == 'POST') {
+      var obj = settings.data;
+      var params = [];
+      for(key in obj){
+        params.push(encodeURIComponent(key) + '=' + encodeURIComponent(obj[key]))
+      }
+      settings.data = params.join('&').replace(/%20/g, '+')
     }
     // if (!settings.url) settings.url = window.location.toString()
     // if ((hashIndex = settings.url.indexOf('#')) > -1) settings.url = settings.url.slice(0, hashIndex)
@@ -248,7 +258,7 @@ const _ = {
       xhr.abort()
       settings.error('超时了');
     }, settings.timeout)
-
+      console.log(settings.data)
     xhr.send(settings.data ? settings.data : null)
     return xhr
   }

@@ -36,6 +36,9 @@ i {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.news-iconarrow-up2:before {
+  content: "\ea3a";
+}
 .news-iconsearch:before {
   content: "\e986";
 }
@@ -54,32 +57,21 @@ i {
 .news-iconarrow-up-left2:before {
   content: "\ea39";
 }
+.news-iconarrow-up:before {
+  content: "\ea32";
+}
 html{
   font-size: 100px;
-}
-body * {
-  padding: 0;
-  margin: 0;
-  font-size: .16rem;
 }
 @media screen and (max-width: 360px){
   html {
     font-size: 90px;
   }
 }
-.imgsContent img {
-  max-width: 100%
-}
-.newsContent p{
-  margin-bottom: 20px;
-  text-align: justify;
-  font-size: .18rem;
-  text-indent: .18rem;
-  padding: 0 10px;
-}
 *{
   margin: 0;
   padding: 0;
+  font-size: .16rem;
 }
 div{
   box-sizing: border-box;

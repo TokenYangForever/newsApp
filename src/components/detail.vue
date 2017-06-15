@@ -19,13 +19,13 @@ export default {
         url: this.$route.params.url
       },
       success: (data) => {
-        data = JSON.parse(data)
-        if (data.code === 200) {
-          if (data.title) {
-            document.title = data.title
-          }
-          document.getElementById('detail').innerHTML = data.htmlContent
-        }
+        // data = JSON.parse(data)
+        // if (data.code === 200) {
+        //   if (data.title) {
+        //     document.title = data.title
+        //   }
+        //   document.getElementById('detail').innerHTML = data.htmlContent
+        // }
       },
       cache: true,
       error: (e) => {

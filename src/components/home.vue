@@ -48,7 +48,9 @@
         </div>
       </div>
     </div>
-
+    <div class="goTop" v-show='showToTop' @click='backToTop'>
+      <i class='news-iconarrow-up2'></i>
+    </div>
     <div class="nomore" v-show='nomoreNews'>
       我是有底线的
     </div>
@@ -78,7 +80,8 @@ export default{
       shownewIndex: 0,
       shownewLength: 10, // 每次刷新显示新闻条数
       nomoreNews: false,
-      loadimgs: 0
+      loadimgs: 0,
+      showToTop: false
     }
   },
   mounted () {
@@ -154,6 +157,9 @@ export default{
 
     watchscroll () {
       let body = document.getElementById('newslist');
+      if (document.body.scrollTop > window.innerHeight) {
+        this.showToTop = true;
+      }
       if (window.scrollY + window.innerHeight > body.offsetHeight && this.shownewIndex !== 0) {
         this.getNewsByType(this.shownewType, this.shownewIndex, this.shownewLength);
       }
@@ -179,11 +185,11 @@ export default{
     },
 
     clickNews (url) {
-      // location.href = url;
-      router.push({
-        name: 'detail',
-        params: { url: url }
-      })
+      location.href = this.$commonjs.apiurl + '/getDetail.html?url=' + url;
+      // router.push({
+      //   name: 'detail',
+      //   params: { url: url }
+      // })
     },
 
     choose (i) {
@@ -198,6 +204,11 @@ export default{
         this.select = i;
         this.shownewType = typemap[this.select]
       }
+    },
+
+    backToTop () {
+      document.body.scrollTop = 0
+      this.showToTop = false
     }
   },
 
@@ -208,6 +219,7 @@ export default{
       } else {
         this.showcal = true
       }
+      this.showToTop = false;
       this.mainnewsList = [];
       this.shownewIndex = this.loadimgs = 0;
       this.getNewsByType(this.shownewType, this.shownewIndex, this.shownewLength);
@@ -222,6 +234,17 @@ export default{
 </script>
 
 <style scoped>
+.goTop{ 
+  font-size: .18rem;
+  background-color: #3e98f0;
+  position: fixed;
+  right: .3rem;
+  bottom: .6rem;
+  width: .4rem;
+  height: .4rem;
+  line-height: .4rem;
+  border-radius: .4rem;
+}
 .topnav-search{
   padding: 7px;
   top: 7px;
