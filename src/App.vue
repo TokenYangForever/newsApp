@@ -123,7 +123,7 @@ div{
   display: flex;
 }
 .navitem.select{
-  border-bottom: 2px solid #fff!important;
+  border-bottom: 2px solid #e0842f;
 }
 .navitem{
   height: inherit;

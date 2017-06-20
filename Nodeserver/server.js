@@ -1,21 +1,14 @@
-﻿const renderer = require('vue-server-renderer').createRenderer({
-  template: require('fs').readFileSync('./views/temp.html', 'utf-8')
-})
-const Vue = require('vue')
-var mysql = require('mysql'); //调用MySQL模块
+﻿var mysql = require('mysql'); //调用MySQL模块
 var express = require('express');
 var bodyParser = require("body-parser"); 
 var cheerio = require('cheerio');
 var request = require('request');
 var http = require('http')
 var app = express()
-var tablemap = {
-  '推荐': ['recommendnews', '新闻中心_综合'],
-  '国际': ['internationalnews', '新闻中心_国际'],
-  '国内': ['domesticnews', '新闻中心_国内'],
-  '社会': ['sociologynews', '新闻中心_社会'],
-  '军事': ['militarynews', '新闻中心_军事']
-}
+const renderer = require('vue-server-renderer').createRenderer({
+  template: require('fs').readFileSync('./views/temp.html', 'utf-8')
+})
+const Vue = require('vue')
 app.use(bodyParser.urlencoded({ extended: false }));
 app.all('*', function(req, res, next) {
    res.header("Access-Control-Allow-Origin", "*");
@@ -160,77 +153,26 @@ app.get('/getDetail.html', function (req, res) {
 app.post('/saveNews.html', function (req, res) {
   var backdata = [];
   rdata = req.body;
-  var userAddSql = "INSERT INTO "+ tablemap[rdata.type][0] +"(author,allPics,URL,title,comments,type) VALUES(?,?,?,?,?,?)";
-  var userAddSql_Params = [
-    rdata['author'],
-    rdata['pic'],
-    rdata['url'],
-    rdata['title'],
-    rdata['comments'],
-    tablemap[rdata.type][1]
-  ]
-  connection.query(userAddSql, userAddSql_Params, function (err, result) {
-    if(err){
-     console.log('[INSERT ERROR] - ',err.message);
-     res.send('error');
-     return;
-    }     
-    res.send(200);  
-  });
-});
-
-app.post('/snifferNews.html', function (req, res) {
-  var backdata = [];
-  rdata = req.body;
-  rdata.num = Number(rdata.num);
-  if(isNaN(rdata.num)){
-    res.send('num要传数字')
+  for(var i = 0;i<rdata.datalength;i++){
+    var seItem = 'sendData['+i+']';
+    var userAddSql = "INSERT INTO "+ rdata.tablename +"(author,allPics,URL,title,summary,comments,type) VALUES(?,?,?,?,?,?,?)";
+    var userAddSql_Params = [
+      rdata[seItem+'[author]'],
+      rdata[seItem+'[allPics]'],
+      rdata[seItem+'[URL]'],
+      rdata[seItem+'[title]'],
+      rdata[seItem+'[summary]'],
+      rdata[seItem+'[comments]'],
+      rdata[seItem+'[type]'],
+    ]
+    connection.query(userAddSql,userAddSql_Params, function (err, result) {
+      if(err){
+       console.log('[INSERT ERROR] - ',err.message);
+       return;
+      }       
+    });
   }
-  request(rdata.targetHtml, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      var $ = cheerio.load(body,{decodeEntities: false});
-      var getTitle,getUrl,getPic,getAuthor
-      // console.log(rdata)
-      console.log($('h4').eq(2).text())
-      // if (rdata.title) {
-      //   getTitle = $(rdata.title)
-      // }
-      // if (rdata.url) {
-      //   getUrl = $(rdata.url)
-      // }
-      // if (rdata.pic) {
-      //   getPic = $(rdata.pic)
-      // }
-      // if (rdata.author) {
-      //   getAuthor = $(rdata.author) 
-      // }
-      // for(var i = 0 ;i < rdata.num; i++){
-      //   console.log(getTitle.eq(i).text()+' '+getPic.eq(i).attr('src')+" " + getAuthor.eq(i).text() + " "+getUrl.eq(i).attr('href'))
-      //   if(getTitle.eq(i).text() && getPic.eq(i).attr('src') && getAuthor.eq(i).text() && getUrl.eq(i).attr('href')){
-      //     var userAddSql = "INSERT INTO "+ tablemap[rdata.type][0] +"(author,allPics,URL,title,type) VALUES(?,?,?,?,?)";
-      //     var userAddSql_Params = [
-      //       getAuthor.eq(i).text(),
-      //       getPic.eq(i).attr('src'),
-      //       getUrl.eq(i).attr('href'),
-      //       getTitle.eq(i).text(),
-      //       tablemap[rdata.type][1]
-      //     ]
-      //     connection.query(userAddSql, userAddSql_Params, function (err, result) {
-      //       if(err){
-      //        console.log('[INSERT ERROR] - ',err.message);
-      //        res.send('error');
-      //        return;
-      //       }     
-      //       res.send(200);  
-      //     });
-      //   }
-      // }
-    } else {
-      // do error
-      console.log(error)
-      console.log(response)
-    }
-  });
+  res.send(200);
 });
 
 function transHtml (obj) {
@@ -263,7 +205,6 @@ function transImg (obj) {
   // return result+='</div>'
   return result
 }
-
 var server = app.listen(8081, function () {
   var host = server.address().address
   var port = server.address().port

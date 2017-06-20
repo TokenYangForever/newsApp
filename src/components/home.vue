@@ -34,7 +34,8 @@
       </div>
     </div>
 
-    <div class="main-news-list">
+    <div class='scroll-hide' v-show='pull'>{{pullText}}</div>
+    <div class="main-news-list" id='pull-refresh'  :style="{transform: 'translateY(' + newslistTrans + 'px)'}">
       <div class="main-news-item" v-for="(item, index) in mainnewsList" :id='index' v-if='item.title' @click='clickNews(item.URL)'>
         <div class="news-item-pic" v-if='item.allPics'>
           <img src='./../assets/default.png' :data-src='item.allPics' class='lazyloadimg'>
@@ -76,18 +77,22 @@ export default{
       translatescroll: '',
       scrollIndex: 0,
       showcal: true,
-      shownewType: 'recommend', // 显示新闻类型
+      shownewType: 'recommend',
       shownewIndex: 0,
-      shownewLength: 10, // 每次刷新显示新闻条数
+      shownewLength: 10,
       nomoreNews: false,
       loadimgs: 0,
-      showToTop: false
+      showToTop: false,
+      pull: false,
+      pullText: '下拉刷新',
+      newslistTrans: 0
     }
   },
   mounted () {
     document.title = 'XX新闻'
     window.onscroll = this.$commonjs.throttle(this.watchscroll, 200)
     this.getCalnews();
+    // this.bindTouchmove()
     this.getNewsByType(this.shownewType, this.shownewIndex, this.shownewLength);
   },
   methods: {
@@ -155,19 +160,8 @@ export default{
       });
     },
 
-    watchscroll () {
-      let body = document.getElementById('newslist');
-      if (document.body.scrollTop > window.innerHeight) {
-        this.showToTop = true;
-      }
-      if (window.scrollY + window.innerHeight > body.offsetHeight && this.shownewIndex !== 0) {
-        this.getNewsByType(this.shownewType, this.shownewIndex, this.shownewLength);
-      }
-      this.lazyLoadimg();
-    },
-
     lazyLoadimg () {
-      let imgs = document.getElementsByClassName('news-item-pic');
+      let imgs = document.querySelectorAll('.news-item-pic');
       for (let i = this.loadimgs; i < imgs.length; i++) {
         if (imgs[i].offsetTop < window.innerHeight + document.body.scrollTop) {
           if (imgs[i].children[0].getAttribute('src') !== imgs[i].children[0].getAttribute('data-src')) {
@@ -186,10 +180,6 @@ export default{
 
     clickNews (url) {
       location.href = this.$commonjs.apiurl + '/getDetail.html?url=' + url;
-      // router.push({
-      //   name: 'detail',
-      //   params: { url: url }
-      // })
     },
 
     choose (i) {
@@ -209,6 +199,55 @@ export default{
     backToTop () {
       document.body.scrollTop = 0
       this.showToTop = false
+    },
+
+    bindTouchmove () { // 绑定拖动事件
+      let _this = this
+      this.$commonjs.bindtouch(
+        'pull-refresh',
+        'Y',
+        () => {
+        },
+        (start, stop) => {
+          let offset = stop - start
+          _this.newslistTrans = Math.min(offset, 50);
+          if (offset > 30) {
+            _this.pull = true
+            if (offset > 50) {
+              _this.pullText = '松开刷新'
+            }
+          }
+        },
+        (start, stop) => {
+          if (stop - start > 50) {
+            console.log('刷新')
+          }
+          _this.newslistTrans = 0
+          _this.pull = false
+          _this.pullText = '下拉刷新'
+        }
+      );
+    },
+
+    unbindTouchmove () {
+      let ele = document.querySelector('#pull-refresh')
+      this.$commonjs.unbindEvent(ele, ['touchmove', 'touchstart', 'touchend'])
+    },
+
+    watchscroll () {
+      let body = document.querySelector('#newslist');
+      if (document.body.scrollTop > window.innerHeight) {
+        this.showToTop = true;
+      }
+      // if (document.body.scrollTop > 0) {
+      //   this.unbindTouchmove()
+      // } else {
+      //   this.bindTouchmove()
+      // }
+      if (window.scrollY + window.innerHeight > body.offsetHeight && this.shownewIndex !== 0) {
+        this.getNewsByType(this.shownewType, this.shownewIndex, this.shownewLength);
+      }
+      this.lazyLoadimg();
     }
   },
 
@@ -234,6 +273,14 @@ export default{
 </script>
 
 <style scoped>
+.scroll-hide{
+  font-size: .18rem;
+  line-height: .5rem;
+  height: .5rem;
+  background-color: #ccc;
+  position: fixed;
+  width: 100%;
+}
 .goTop{ 
   font-size: .18rem;
   background-color: #3e98f0;

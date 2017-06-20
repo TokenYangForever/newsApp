@@ -1,4 +1,4 @@
-Date.prototype.format = function (format) {
+Date.prototype.format = format => {
   var o = {
     'M+': this.getMonth() + 1,
     'd+': this.getDate(),
@@ -19,11 +19,28 @@ Date.prototype.format = function (format) {
   }
   return format;
 };
-Date.getWeek = function (e) {
+Date.getWeek = e => {
   this.aWeek = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
   return this.aWeek[e];
 }
+
+if (!Array.isArray) {
+  Array.isArray = arr => {
+    return arr.__proto__ === Array.prototype
+  }
+}
+
+if (!Array.from) {
+  Array.from = arrayLike => {
+    [].slice.call(arrayLike)
+  }
+  
+}
+
 const _ = {
+  eventProxy:{
+  },
+
   apiurl: location.href.indexOf('http://ty.qitouch.cn') > -1 ? 'http://ty.qitouch.cn:8081' : 'http://localhost:8081',
 
   debounce: function (func, wait, options) {
@@ -160,7 +177,6 @@ const _ = {
   },
 
   ajax: function (options) {
-    console.log(options)
     var ajaxSettings = {
       type: 'GET',
       url: '',
@@ -258,9 +274,56 @@ const _ = {
       xhr.abort()
       settings.error('超时了');
     }, settings.timeout)
-      console.log(settings.data)
     xhr.send(settings.data ? settings.data : null)
     return xhr
+  },
+
+  bindtouch: function (element_id, axis, start_callback, move_callback, end_callback) {
+    let startIndex = 0,
+        stopIndex = 0
+    let w_element = document.querySelector('#' + element_id)
+    let client_axis = 'Xx'.indexOf(axis) > -1 ? 'clientX' : 'clientY'
+    this.bindEvent(w_element, 'touchstart', function (e) {
+      startIndex = stopIndex = e.targetTouches[0][client_axis]
+      if (start_callback) {
+        start_callback(startIndex, stopIndex)
+      }
+    })
+    this.bindEvent(w_element, 'touchmove', function (e) {
+      stopIndex = e.targetTouches[0][client_axis]
+      if (move_callback) {
+        move_callback(startIndex, stopIndex)
+      }
+    })
+    this.bindEvent(w_element, 'touchend', function (e) {
+      if (end_callback) {
+        end_callback(startIndex, stopIndex)
+      }
+    })
+  },
+
+  bindEvent: function (ele, e_name, func, useCapture = false) { // IE9+ 不支持addEventListener的浏览器需要使用attachEvent()
+    let proxyName = ele.id + e_name
+    this.eventProxy[proxyName] = func;
+    if (Array.isArray(ele) || Array.isArray(Array.from(ele))) {
+      for (i in ele) {
+        ele[i].addEventListener(e_name, this.eventProxy[proxyName], useCapture)
+      }
+    } else {
+      ele.addEventListener(e_name, this.eventProxy[proxyName], useCapture)
+    }
+  },
+
+  unbindEvent: function (ele, e_name, useCapture = false) {
+    if (Array.isArray(e_name)){
+      for (let i in e_name) {
+        if(this.eventProxy[ele.id+e_name[i]])
+          ele.removeEventListener(e_name[i], this.eventProxy[ele.id + e_name[i]], useCapture);
+      }
+    } else {
+      if (this.eventProxy[ele.id + e_name])
+      ele.removeEventListener(e_name, this.eventProxy[ele.id + e_name], useCapture);
+    }   
   }
 }
 export default _
