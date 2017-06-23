@@ -197,8 +197,13 @@ export default{
     },
 
     backToTop () {
-      document.body.scrollTop = 0
-      this.showToTop = false
+      var time = setInterval(() => {
+        document.body.scrollTop = document.body.scrollTop - 50;
+        if (document.body.scrollTop === 0) {
+          clearInterval(time);
+          this.showToTop = false
+        }
+      }, 1);
     },
 
     bindTouchmove () { // 绑定拖动事件

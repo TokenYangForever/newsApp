@@ -202,7 +202,6 @@ const _ = {
       if (query == '') return url
       return (url + '&' + query).replace(/[&?]{1,2}/, '?')
     }
-   
     var settings = ajaxSettings;
     for (var key in ajaxSettings) {
       if (options[key] != undefined) {
@@ -267,8 +266,6 @@ const _ = {
     if(settings.type == 'POST') {
       for (name in headers) nativeSetHeader.apply(xhr, headers[name])
     }
-    
-
     if (settings.timeout > 0) abortTimeout = setTimeout(function(){
       xhr.onreadystatechange = function(){}
       xhr.abort()
